@@ -1,0 +1,14 @@
+---
+import V1Only from "../components/v1-only.astro";
+
+export const getStaticPaths = () => ([
+  { params: { path: "v1" } },
+  { params: { path: "v2" } },
+]);
+
+const { params: { path }} = Astro;
+---
+
+<h1>This is "{path}" page.</h1>
+
+{path === "v1" ? <V1Only /> : <p>0 JS for v2!</p>}
