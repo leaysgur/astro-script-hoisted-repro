@@ -1,47 +1,53 @@
-# Astro Starter Kit: Minimal
+# astro-script-hoisted-repro
+
+## Overview
+
+- Project structure
 
 ```
-npm create astro@latest -- --template minimal
+src
+├── components
+│   └── v1-only.astro
+└── pages
+    ├── [path].astro
+    └── index.astro
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/minimal)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/minimal)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/minimal/devcontainer.json)
+- `pages/[path].astro` will render 2 patterns
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+```astro
+---
+import V1Only from "../components/v1-only.astro";
 
-## 🚀 Project Structure
+export const getStaticPaths = () => ([
+  { params: { path: "v1" } },
+  { params: { path: "v2" } },
+]);
 
-Inside of your Astro project, you'll see the following folders and files:
+const { params: { path }} = Astro;
+---
 
+<h1>This is "{path}" page.</h1>
+
+{path === "v1" ? <V1Only /> : <p>0 JS for v2!</p>}
 ```
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+
+- only `v1` page has `<V1Only />` component which includes `<script>`
+
+```astro
+<p>For v1, we need JS.</p>
+<script>
+  document.querySelector('p').textContent = 'JS is working for v1';
+</script>
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Expect
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+- Rendered `/v1` page should have `<script>`
+- Rendered `/v2` page should NOT have `<script>`
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Actual
 
-## 🧞 Commands
+- Both pages have `<script>`...
 
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:3000`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+See [dist/v2/index.html](./dist/v2/index.html).
